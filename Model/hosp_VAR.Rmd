@@ -1,0 +1,371 @@
+
+
+```{r,include=FALSE}
+library(CADFtest)
+library(lubridate)
+library(dplyr)
+library(broom)
+library(readr)
+library(ggplot2)
+library(generics)
+library(forecast)
+library(fpp2)
+library(TTR)
+library(dplyr)
+library(tidyverse)
+library(tidyr)
+library(vars)
+library(strucchange)
+library(lmtest)
+library(PerformanceAnalytics)
+library(xts)
+library(fGarch)
+library(tsibble)
+library(plyr)
+library(imputeTS)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(stringr)
+library(base)
+library(sf)
+library(scales)
+library(lubridate)
+library(aTSA)
+library(tseries)
+library(forecast)
+library(CADFtest)
+library(vars)
+library(urca)
+library(lattice)
+library(ggplot2)
+library(MASS)
+library(tidymodels)
+library(rugarch)
+library(garchmodels)
+library(rmgarch)
+library(modeltime)
+library(timetk)
+library(tsDyn) 
+library(bvartools)
+library(xtable)
+library(ggthemes)
+library(Metrics)
+```
+
+```{r}
+weekly=read.csv('weekly_data.csv')
+daily=read.csv('daily_all_data.csv')
+sum(is.na(weekly))
+weekly$humidity=weekly$humidity/100
+```
+
+# stationarity check
+```{r}
+hosp.ts=ts(weekly$hosp_patients, start=c(2020,4), frequency=52)
+icu.ts=ts(weekly$icu_patients, start=c(2020,4), frequency=52)
+cases.ts=ts(weekly$new_cases, start=c(2020,4), frequency=52)
+deaths.ts=ts(weekly$new_deaths, start=c(2020,4), frequency=52)
+temp.ts=ts(weekly$temp, start=c(2020,4), frequency=52)
+humidity.ts=ts(weekly$humidity, start=c(2020,4), frequency=52)
+wind.ts=ts(weekly$windspeed, start=c(2020,4), frequency=52)
+precip.ts=ts(weekly$precip, start=c(2020,4), frequency=52)
+stringency.ts=ts(weekly$stringency_index, start=c(2020,4), frequency=52)
+fatality.ts=ts(weekly$case_fatality, start=c(2020,4), frequency=52)
+reproduction.ts=ts(weekly$reproduction_rate, start=c(2020,4), frequency=52)
+
+
+adf.test(hosp.ts) # no
+adf.test(icu.ts) #no
+adf.test(cases.ts) #no
+adf.test(deaths.ts) #no
+adf.test(temp.ts) #no
+adf.test(humidity.ts) # no
+adf.test(wind.ts) #stationary
+adf.test(precip.ts) #stationary
+adf.test(stringency.ts) #no
+adf.test(fatality.ts) #stationary
+adf.test(reproduction.ts) #stationary
+```
+
+# cointegration tests
+```{r}
+#Engle-Granger test
+fit_ci <- lm(hosp.ts ~ cases.ts+deaths.ts+temp.ts+humidity.ts+wind.ts+precip.ts+stringency.ts+fatality.ts+reproduction.ts)
+res_fit_ci <- fit_ci$residuals
+max.lag<-round(sqrt(length(hosp.ts)))
+CADFtest(res_fit_ci,type="drift",criterion="BIC",max.lag.y=max.lag)
+# Engle Granger test H0: no cointegration
+# ADF test rejects the H0, we conclude there is no unit root in the residual, and it proves that the explanatory variables are cointegrated with hospital admission.
+ 
+
+# Johansen's Test
+trace_test<-ca.jo(weekly[,c(2:12)],type="trace",K=3,ecdet="const",spec="transitory")
+#with lag order k=3
+summary(trace_test)
+
+maxeign_test=ca.jo(weekly[,c(2:12)], type='eigen', K=3, ecdet='const',spec='transitory')
+summary(maxeign_test)
+
+# there is cointegration 
+
+```
+
+
+ 
+```{r}
+var_train=weekly[,c(2:12)]
+VARselect(var_train,type="both", lag.max=5) 
+var <- VAR(var_train, p = 2)
+summary(var)
+```
+
+
+```{r}
+
+# Initialize variables for storing results
+predictions <- list()
+diff <- list()
+prediction_inv=list()
+summary_model=list()
+# Loop through time series data with sliding window
+sliding_window_VAR_hosp=function(data,lag, window_length,ahead){
+  for (i in 1:(length(data$new_cases)-window_length+1)) {
+
+  # Create subset of time series data for current window
+  subset_data <- data[i:(i+window_length-1), ]
+  h_mean=mean(subset_data$hosp_patients)
+  #print(h_mean)
+            
+  h_sd=sd(subset_data$hosp_patients)
+  sub_scale=subset_data[,c(1,3,4,6:10)]%>%mutate_all(~scale(.)%>%as.vector())
+  sub_scale=sub_scale%>%mutate(
+                         precip=subset_data$precip,
+                         reproduction=subset_data$reproduction_rate,
+                         fatality=subset_data$case_fatality)
+  # Fit VAR model to current subset of data
+  var_model <- VAR(sub_scale, p = lag)
+  #sum=xtable(var_model$varresult$hosp_patients)
+  #print(sum)
+
+  # Generate predictions for next time step
+  forecast <- predict(var_model, n.ahead = ahead)
+  #print(forecast)
+  # Store predicted value in list
+  predictions[[i+window_length]]<-forecast$fcst$hosp_patients[,1]
+  #print(forecast$fcst$hosp_patients[,1])
+  prediction_inv[[i+window_length]]=forecast$fcst$hosp_patients[,1]*h_sd+h_mean
+  #summary_model <- append(summary_model, list(sum))
+  }
+  return(prediction_inv)
+}
+```
+
+
+```{r}
+prediction_store=function(prediction, day){
+  store_list=list()
+  for(i in 71:length(weekly$new_cases)-3){
+    store_list[i]=prediction[i][[1]][day]
+
+  }
+  return(store_list[71:length(weekly$new_cases)])
+}
+
+
+
+```
+
+
+```{r}
+window_length <-70
+ts_data <-var_train
+set.seed(100)
+
+predicts_var5=sliding_window_VAR_hosp(ts_data ,5, window_length,4)
+predicts_var4=sliding_window_VAR_hosp(ts_data ,4, window_length,4)
+predicts_var3=sliding_window_VAR_hosp(ts_data ,3, window_length,4)
+predicts_var2=sliding_window_VAR_hosp(ts_data ,2, window_length,4)
+predicts_var1=sliding_window_VAR_hosp(ts_data ,1, window_length,4)
+```
+
+```{r}
+
+dayt1_pred_var5=prediction_store(predicts_var5, 1)
+dayt2_pred_var5=prediction_store(predicts_var5, 2)
+dayt3_pred_var5=prediction_store(predicts_var5, 3)
+dayt4_pred_var5=prediction_store(predicts_var5, 4)
+
+dayt1_pred_var4=prediction_store(predicts_var4, 1)
+dayt2_pred_var4=prediction_store(predicts_var4, 2)
+dayt3_pred_var4=prediction_store(predicts_var4, 3)
+dayt4_pred_var4=prediction_store(predicts_var4, 4)
+
+dayt1_pred_var3=prediction_store(predicts_var3, 1)
+dayt2_pred_var3=prediction_store(predicts_var3, 2)
+dayt3_pred_var3=prediction_store(predicts_var3, 3)
+dayt4_pred_var3=prediction_store(predicts_var3, 4)
+
+dayt1_pred_var2=prediction_store(predicts_var2, 1)
+dayt2_pred_var2=prediction_store(predicts_var2, 2)
+dayt3_pred_var2=prediction_store(predicts_var2, 3)
+dayt4_pred_var2=prediction_store(predicts_var2, 4)
+
+dayt1_pred_var1=prediction_store(predicts_var1, 1)
+dayt2_pred_var1=prediction_store(predicts_var1, 2)
+dayt3_pred_var1=prediction_store(predicts_var1, 3)
+dayt4_pred_var1=prediction_store(predicts_var1, 4)
+
+```
+
+```{r}
+ggplot(weekly[71:137,], mapping=aes(as.Date(weekly$week[71:137])))+
+  geom_line(mapping=aes(y=weekly$hosp_patients[71:137], color="actual"))+
+geom_line(mapping=aes(y=unlist(dayt1_pred_var2), color = "predict"))+
+  xlab("Time") + ylab('Hospial admission')+
+           theme(panel.background = element_rect(fill = "white", colour = "black"))+
+           scale_x_date(labels=date_format ("%m-%y"))+
+   scale_color_manual(values=c('red','blue'))
+```
+
+
+```{r}
+rmse_func=function(actual, lag1, lag2, lag3, lag4, lag5){
+  rmse_var1=sqrt(mean((actual-unlist(lag1))^2))
+  rmse_var2=sqrt(mean((actual-unlist(lag2))^2))
+  rmse_var3=sqrt(mean((actual-unlist(lag3))^2))
+  rmse_var4=sqrt(mean((actual-unlist(lag4))^2))
+  rmse_var5=sqrt(mean((actual-unlist(lag5))^2))
+  
+  return(c(rmse_var1,rmse_var2,rmse_var3,rmse_var4, rmse_var5))
+}
+
+rmse_day1=rmse_func(weekly$hosp_patients[71:137],dayt1_pred_var1,dayt1_pred_var2, dayt1_pred_var3,dayt1_pred_var4,dayt1_pred_var5)
+
+rmse_day2=rmse_func(weekly$hosp_patients[72:138],dayt2_pred_var1,dayt2_pred_var2, dayt2_pred_var3,dayt2_pred_var4,dayt2_pred_var5)
+
+rmse_day3=rmse_func(weekly$hosp_patients[73:139],dayt3_pred_var1,dayt3_pred_var2, dayt3_pred_var3,dayt3_pred_var4,dayt3_pred_var5)
+
+rmse_day4=rmse_func(weekly$hosp_patients[74:140],dayt4_pred_var1,dayt4_pred_var2, dayt4_pred_var3,dayt4_pred_var4,dayt4_pred_var5)
+
+
+mape_func=function(actual, lag1, lag2, lag3, lag4, lag5){
+  mape_var1=mean(abs((actual-unlist(lag1))/actual))
+  mape_var2=mean(abs((actual-unlist(lag2))/actual))
+  mape_var3=mean(abs((actual-unlist(lag3))/actual))
+  mape_var4=mean(abs((actual-unlist(lag4))/actual))
+  mape_var5=mean(abs((actual-unlist(lag5))/actual))
+  
+  return(c(mape_var1,mape_var2,mape_var3,mape_var4,mape_var5))
+     
+}
+mape_day1=mape_func(weekly$hosp_patients[71:137],dayt1_pred_var1,dayt1_pred_var2,dayt1_pred_var3,dayt1_pred_var4,dayt1_pred_var5)
+
+mape_day2=mape_func(weekly$hosp_patients[72:138],dayt2_pred_var1,dayt2_pred_var2,dayt2_pred_var3,dayt2_pred_var4,dayt2_pred_var5)
+
+mape_day3=mape_func(weekly$hosp_patients[73:139],dayt3_pred_var1,dayt3_pred_var2,dayt3_pred_var3,dayt3_pred_var4,dayt3_pred_var5)
+
+mape_day4=mape_func(weekly$hosp_patients[74:140],dayt4_pred_var1,dayt4_pred_var2,dayt4_pred_var3,dayt4_pred_var4,dayt4_pred_var5)
+
+rmse_table=data.frame(rbind(rmse_day1,rmse_day2,rmse_day3,rmse_day4))
+colnames(rmse_table)=c('lag1', 'lag2', 'lag3', 'lag4', 'lag5')
+
+mape_table=data.frame(rbind(mape_day1,mape_day2,mape_day3,mape_day4))
+colnames(mape_table)=c('lag1', 'lag2', 'lag3', 'lag4', 'lag5')
+```
+
+```{r}
+R2= function(y_actual,lag1, lag2, lag3, lag4, lag5){
+  r1=cor(y_actual,unlist(lag1))^2
+  r2=cor(y_actual,unlist(lag2))^2
+  r3=cor(y_actual,unlist(lag3))^2
+  r4=cor(y_actual,unlist(lag4))^2
+  r5=cor(y_actual,unlist(lag5))^2
+  return(c(r1,r2,r3,r4,r5))
+}
+
+r2_day1=R2(weekly$hosp_patients[71:137],dayt1_pred_var1,dayt1_pred_var2,dayt1_pred_var3,dayt1_pred_var4,dayt1_pred_var5)
+
+r2_day2=R2(weekly$hosp_patients[72:138],dayt2_pred_var1,dayt2_pred_var2,dayt2_pred_var3,dayt2_pred_var4,dayt2_pred_var5)
+
+r2_day3=R2(weekly$hosp_patients[73:139],dayt3_pred_var1,dayt3_pred_var2,dayt3_pred_var3,dayt3_pred_var4,dayt3_pred_var5)
+
+r2_day4=R2(weekly$hosp_patients[74:140],dayt4_pred_var1,dayt4_pred_var2,dayt4_pred_var3,dayt4_pred_var4,dayt4_pred_var5)
+
+mae_func=function(actual, lag1, lag2, lag3, lag4, lag5){
+  mae1=sum(abs(actual - unlist(lag1)))/length(actual)
+  mae2=sum(abs(actual -  unlist(lag2)))/length(actual)
+  mae3=sum(abs(actual -  unlist(lag3)))/length(actual)
+  mae4=sum(abs(actual -  unlist(lag4)))/length(actual)
+  mae5=sum(abs(actual -  unlist(lag5)))/length(actual)
+  return(c(mae1, mae2, mae3, mae4, mae5))
+}
+
+mae_day1=mae_func(weekly$hosp_patients[71:137],dayt1_pred_var1,dayt1_pred_var2,dayt1_pred_var3,dayt1_pred_var4,dayt1_pred_var5)
+
+mae_day2=mae_func(weekly$hosp_patients[72:138],dayt2_pred_var1,dayt2_pred_var2,dayt2_pred_var3,dayt2_pred_var4,dayt2_pred_var5)
+
+mae_day3=mae_func(weekly$hosp_patients[73:139],dayt3_pred_var1,dayt3_pred_var2,dayt3_pred_var3,dayt3_pred_var4,dayt3_pred_var5)
+
+mae_day4=mae_func(weekly$hosp_patients[74:140],dayt4_pred_var1,dayt4_pred_var2,dayt4_pred_var3,dayt4_pred_var4,dayt4_pred_var5)
+
+
+R2_table=data.frame(rbind(r2_day1,r2_day2,r2_day3,r2_day4))
+colnames(R2_table)=c('lag1', 'lag2', 'lag3', 'lag4', 'lag5')
+
+mae_table=data.frame(rbind(mae_day1,mae_day2,mae_day3,mae_day4))
+colnames(mae_table)=c('lag1', 'lag2', 'lag3', 'lag4', 'lag5')
+
+```
+
+
+```{r}
+window_length <-270
+ts_data_daily <-var_daily_train[,c(5:10, 1:4, 11)]
+set.seed(100)
+ts_data_daily$case_fatality=ifelse(ts_data_daily$case_fatality==0, NA,ts_data_daily$case_fatality )
+ts_data_daily$case_fatality=na.interp(ts_data_daily$case_fatality)
+
+
+predicts_var10=sliding_window_VAR_hosp(ts_data_daily ,12, window_length,4)
+
+```
+
+
+```{r}
+prediction_store_day=function(prediction, day){
+  store_list=list()
+  for(i in 271:length(daily$new_cases)-3){
+    store_list[i]=prediction[i][[1]][day]
+
+  }
+  return(store_list[271:length(daily$new_cases)-3])
+}
+
+dayt1_pred_var10=prediction_store_day(predicts_var10, 1)
+dayt2_pred_var10=prediction_store_day(predicts_var10, 2)
+dayt3_pred_var10=prediction_store_day(predicts_var10, 3)
+dayt4_pred_var10=prediction_store_day(predicts_var10, 4)
+
+
+rmse_var1=sqrt(mean((daily$hosp_patients[274:974]-unlist(dayt3_pred_var10))^2))
+ 
+mape_var1=mean(abs((daily$hosp_patients[274:974]-unlist(dayt3_pred_var10))/daily$hosp_patients[274:974]))
+
+r1=cor(daily$hosp_patients[274:974],unlist(dayt3_pred_var10))^2
+ 
+mae1=sum(abs(daily$hosp_patients[274:974] - unlist(dayt3_pred_var10)))/length(daily$hosp_patients[274:974])
+
+
+```
+
+```{r}
+ggplot(daily[271:971,], mapping=aes(as.Date(daily$date[271:971])))+
+  geom_line(mapping=aes(y=daily$hosp_patients[271:971], color="actual"))+
+geom_line(mapping=aes(y =unlist(dayt1_pred_var10), color = "predict"))+
+  xlab("Time") + ylab('Hospital admission')+
+           theme(panel.background = element_rect(fill = "white", colour = "black"))+
+           scale_x_date(labels=date_format ("%m-%y"))+
+   scale_color_manual(values=c('red','blue'))
+```
+

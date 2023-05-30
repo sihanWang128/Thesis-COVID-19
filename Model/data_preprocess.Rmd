@@ -1,0 +1,252 @@
+```{r,include=FALSE}
+library(plyr)
+library(imputeTS)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(lubridate)
+library(aTSA)
+library(tseries)
+library(forecast)
+library(CADFtest)
+library(plotly)
+library(ggpubr)
+library(psych)
+library(corrplot)
+library(stringr)
+library(base)
+library(sf)
+library(scales)
+library(vars)
+library(lattice)
+library(urca)
+library(ggplot2)
+library(MASS)
+library(haven)
+library(joineR)
+library(pROC)
+library(MESS)
+library(arules)
+library(fpp2)
+```
+
+
+## Read the data files
+
+The research process involves reading four data files: government stringency_index data, mobility data, weather data, and COVID related data from Our World in data. The goal is to extract valuable information from these files in order to generate a COVID data table. The research aim was to understand the impact of these factors on the spread of COVID-19 and to inform public health decision-making.
+
+```{r}
+
+fulldata <- read.csv('owid_data copy.csv')
+
+weatherNL1=read.csv('weather1.csv')
+weatherNL2=read.csv('weather2.csv')
+
+vaccine=read.csv('vaccinations.csv')
+
+weather=rbind(weatherNL1, weatherNL2)
+```
+
+
+```{r}
+colnames(fulldata)
+```
+
+```{r}
+select_date=function(start_date, end_date){
+
+#weather data
+weatherNL=weather %>% filter(datetime>=start_date)%>%filter(datetime<= end_date)%>%dplyr::select(datetime, temp, humidity, precip, windspeed)%>%dplyr::rename('date'='datetime')
+
+#aggregating data together
+NLdata1 <- fulldata %>%filter(location=="Netherlands") %>% filter(date >= start_date)%>%filter(date<= end_date)%>%dplyr::select(date, new_cases, new_deaths, icu_patients, hosp_patients, stringency_index, reproduction_rate)
+
+df2 <- join_all(list(NLdata1,weatherNL), by='date', type='left')
+
+return(df2)
+}
+```
+
+
+```{r}
+data_new=select_date('2020-04-01', '2022-11-30')
+
+```
+
+```{r}
+data_new$date <- as.Date(data_new$date)
+out1=data_new[519:548,c(1, 2) ]
+out2=data_new[672:699,c(1, 2) ]
+out1$color=ifelse(out1$new_cases==22, 'outlier', 'normal')
+out2$color=ifelse(out2$new_cases==2, 'outlier', ifelse(out2$new_cases==380399, 'outlier', 'normal'))
+ggplot(out1, )+geom_point(aes(x=date, y=new_cases, color=color))+scale_x_date(date_breaks = "8 day", date_labels =  "%Y-%m-%d")
+
+ggplot(out2, )+geom_point(aes(x=date, y=new_cases, color=color))+scale_x_date(date_breaks = "8 day", date_labels =  "%Y-%m-%d")
+```
+
+```{r}
+sum(is.na(data_new))
+for (i in colnames(data_new)){
+  print(i)
+  print(sum(is.na(data_new[i])))
+}
+
+#[1] "new_deaths"
+#[1] 5
+#[1] "icu_patients"
+#[1] 73
+#[1] "hosp_patients"
+#[1] 73
+
+```
+
+
+for the outliers in new cases variable, we replace it using na.interp()
+```{r}
+data_new$new_cases=ifelse(data_new$new_cases<50, NA,ifelse(data_new$new_cases>300000, NA, data_new$new_cases))
+data_new$icu_patients=na.interp(data_new$icu_patients)
+data_new$hosp_patients=na.interp(data_new$hosp_patients)
+data_new$new_cases=na.interp(data_new$new_cases)
+data_new$new_deaths=na.interp(data_new$new_deaths)
+data_new$stringency_index=na.interp(data_new$stringency_index)
+#data_new$hosp_patients=na.interp(data_new$hosp_patients)
+#data_new$people_vaccinated=na.interp(data_new$people_vaccinated)
+#data_new$new_vaccinations=na.interp(data_new$new_vaccinations)
+
+data_new$case_fatality=data_new$new_deaths/data_new$new_cases
+
+sum(is.na(data_new))
+```
+
+```{r}
+describe(data_new)
+
+corrplot(cor(na.omit(data_new[, 2:11])), method = "circle", tl.cex = 0.5) 
+
+```
+
+```{r}
+
+ggplot(data_new, aes(x=date, y=new_cases)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("New cases") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+
+ggplot(data_new, aes(x=date, y=new_deaths)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("New deaths")+theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+ggplot( data_new, aes(x=date, y=reproduction_rate)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("Reproduction rate") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+ggplot( data_new, aes(x=date, y=case_fatality)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("Case fatality rate") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+
+ggplot( data_new, aes(x=date, y=hosp_patients)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("hospital admission") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+
+ggplot(  data_new,aes(x=date, y=icu_patients)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("ICU admission") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+
+ggplot( data_new, aes(x=date, y=temp)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("Temperature") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+ggplot( data_new, aes(x=date, y=windspeed)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("Wind speed") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+ 
+ggplot( data_new, aes(x=date, y=humidity)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("Humidity") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+ggplot( data_new, aes(x=date, y=precip)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("Rain fall") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+
+ggplot( data_new, aes(x=date, y=stringency_index)) +
+    geom_area(fill="#69b3a2", alpha=0.5) +
+    geom_line(color="#69b3a2") +
+    ylab("Stringency index") +theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5))+scale_x_date(date_breaks = "8 month", date_labels =  "%Y-%m")
+
+
+```
+
+
+
+
+
+```{r}
+data_new$reproduction_rate=data_new$new_deaths/data_new$new_cases
+```
+
+```{r}
+write.csv(data_new, 'daily_all_data.csv',row.names = FALSE)
+```
+
+
+# aggregating daily data into weekly data
+```{r}
+week_data=function(df){
+   df$week=cut(as.Date(df$date), "week", start.on.monday = TRUE)
+   t1=ddply(df, .(week), colwise(mean, 6:11))
+   t2=ddply(df, .(week), colwise(sum, 2:5))
+   t=join_all(list(t1, t2), by='week', type='left')
+  return(t)
+}
+weekdata=week_data(data_new)
+weekdata$case_fatality=weekdata$new_deaths/weekdata$new_cases
+```
+
+```{r}
+#hosp week t vs week t 
+corrplot(cor(na.omit(weekdata[, 2:12])), method = "circle", tl.cex = 1) 
+
+#hosp week t+1 vs week t 
+hosp=weekdata$hosp_patients[2:length(weekdata$hosp_patients)]
+icu=weekdata$icu_patients[2:length(weekdata$hosp_patients)]
+week_lag1=weekdata[1:length(weekdata$date)-1,]
+week_lag1$hosp_patients=hosp
+week_lag1$icu_patients=icu
+#week_lag1=week_lag1[, c(1,12,13,2:11)]
+corrplot(cor(na.omit(week_lag1[, 2:12])), method = "circle", tl.cex = 1) 
+
+#hosp week t+2 vs week t 
+hosp=weekdata$hosp_patients[3:length(weekdata$hosp_patients)]
+icu=weekdata$icu_patients[3:length(weekdata$hosp_patients)]
+week_lag1=weekdata[1:length(weekdata$date)-2,]
+week_lag1$hosp_patients=hosp
+week_lag1$icu_patients=icu
+#week_lag1=week_lag1[, c(1,12,13,2:11)]
+corrplot(cor(na.omit(week_lag1[, 2:12])), method = "circle", tl.cex = 1) 
+```
+
+
+```{r}
+write.csv(weekdata, 'weekly_data.csv',row.names = FALSE)
+```
+
+
+
+```{r}
+sum(is.na(weekdata))
+```
+
