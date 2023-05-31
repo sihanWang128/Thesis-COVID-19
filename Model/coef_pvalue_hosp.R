@@ -1,5 +1,7 @@
 
-
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
 temp=read.table('/Users/sihanwang/hosp_estimat/hosp_temp.txt')[,c(1,3,9)]
 wind=read.table('/Users/sihanwang/hosp_estimat/hosp_wind.txt')[,c(1,3,9)]
 hum=read.table('/Users/sihanwang/hosp_estimat/hosp_humid.txt')[,c(1,3,9)]
