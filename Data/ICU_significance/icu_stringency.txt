@@ -1,0 +1,142 @@
+stringency\_index.l1 & 0.0046 & 0.0302 & 0.15 & 0.8800 \\ 
+  stringency\_index.l2 & 0.0110 & 0.0345 & 0.32 & 0.7517 \\ 
+stringency\_index.l1 & -0.0085 & 0.0271 & -0.31 & 0.7560 \\ 
+  stringency\_index.l2 & 0.0272 & 0.0305 & 0.89 & 0.3776 \\ 
+stringency\_index.l1 & -0.0149 & 0.0273 & -0.55 & 0.5884 \\ 
+  stringency\_index.l2 & 0.0367 & 0.0306 & 1.20 & 0.2370 \\ 
+stringency\_index.l1 & -0.0121 & 0.0300 & -0.40 & 0.6877 \\ 
+  stringency\_index.l2 & 0.0376 & 0.0331 & 1.14 & 0.2614 \\ 
+stringency\_index.l1 & -0.0157 & 0.0316 & -0.50 & 0.6224 \\ 
+  stringency\_index.l2 & 0.0405 & 0.0354 & 1.14 & 0.2589 \\ 
+stringency\_index.l1 & -0.0189 & 0.0323 & -0.59 & 0.5611 \\ 
+  stringency\_index.l2 & 0.0401 & 0.0360 & 1.12 & 0.2706 \\ 
+stringency\_index.l1 & -0.0184 & 0.0329 & -0.56 & 0.5784 \\ 
+  stringency\_index.l2 & 0.0386 & 0.0363 & 1.06 & 0.2937 \\ 
+stringency\_index.l1 & -0.0178 & 0.0327 & -0.54 & 0.5898 \\ 
+  stringency\_index.l2 & 0.0482 & 0.0370 & 1.30 & 0.1991 \\ 
+stringency\_index.l1 & -0.0166 & 0.0328 & -0.50 & 0.6161 \\ 
+  stringency\_index.l2 & 0.0513 & 0.0379 & 1.35 & 0.1822 \\ 
+stringency\_index.l1 & -0.0155 & 0.0336 & -0.46 & 0.6470 \\ 
+  stringency\_index.l2 & 0.0537 & 0.0387 & 1.39 & 0.1723 \\ 
+stringency\_index.l1 & -0.0219 & 0.0342 & -0.64 & 0.5253 \\ 
+  stringency\_index.l2 & 0.0581 & 0.0386 & 1.51 & 0.1390 \\ 
+stringency\_index.l1 & -0.0207 & 0.0347 & -0.60 & 0.5537 \\ 
+  stringency\_index.l2 & 0.0602 & 0.0388 & 1.55 & 0.1278 \\ 
+stringency\_index.l1 & -0.0195 & 0.0352 & -0.56 & 0.5810 \\ 
+  stringency\_index.l2 & 0.0614 & 0.0402 & 1.53 & 0.1342 \\ 
+stringency\_index.l1 & -0.0053 & 0.0355 & -0.15 & 0.8830 \\ 
+  stringency\_index.l2 & 0.0568 & 0.0399 & 1.42 & 0.1617 \\ 
+stringency\_index.l1 & 0.0008 & 0.0364 & 0.02 & 0.9816 \\ 
+  stringency\_index.l2 & 0.0582 & 0.0406 & 1.44 & 0.1580 \\ 
+stringency\_index.l1 & 0.0110 & 0.0377 & 0.29 & 0.7728 \\ 
+  stringency\_index.l2 & 0.0652 & 0.0420 & 1.55 & 0.1278 \\ 
+stringency\_index.l1 & 0.0097 & 0.0401 & 0.24 & 0.8094 \\ 
+  stringency\_index.l2 & 0.0693 & 0.0449 & 1.54 & 0.1296 \\ 
+stringency\_index.l1 & 0.0152 & 0.0403 & 0.38 & 0.7075 \\ 
+  stringency\_index.l2 & 0.0675 & 0.0449 & 1.50 & 0.1396 \\ 
+stringency\_index.l1 & 0.0227 & 0.0388 & 0.59 & 0.5609 \\ 
+  stringency\_index.l2 & 0.0532 & 0.0431 & 1.23 & 0.2234 \\ 
+stringency\_index.l1 & 0.0223 & 0.0392 & 0.57 & 0.5729 \\ 
+  stringency\_index.l2 & 0.0484 & 0.0440 & 1.10 & 0.2767 \\ 
+stringency\_index.l1 & 0.0259 & 0.0413 & 0.63 & 0.5332 \\ 
+  stringency\_index.l2 & 0.0460 & 0.0453 & 1.02 & 0.3148 \\ 
+stringency\_index.l1 & 0.0246 & 0.0427 & 0.58 & 0.5680 \\ 
+  stringency\_index.l2 & 0.0393 & 0.0463 & 0.85 & 0.4005 \\ 
+stringency\_index.l1 & 0.0093 & 0.0416 & 0.22 & 0.8240 \\ 
+  stringency\_index.l2 & 0.0508 & 0.0465 & 1.09 & 0.2798 \\ 
+stringency\_index.l1 & 0.0126 & 0.0426 & 0.30 & 0.7692 \\ 
+  stringency\_index.l2 & 0.0518 & 0.0458 & 1.13 & 0.2641 \\ 
+stringency\_index.l1 & 0.0143 & 0.0446 & 0.32 & 0.7501 \\ 
+  stringency\_index.l2 & 0.0363 & 0.0468 & 0.78 & 0.4415 \\ 
+stringency\_index.l1 & 0.0109 & 0.0450 & 0.24 & 0.8101 \\ 
+  stringency\_index.l2 & 0.0478 & 0.0454 & 1.05 & 0.2978 \\ 
+stringency\_index.l1 & -0.0270 & 0.0499 & -0.54 & 0.5915 \\ 
+  stringency\_index.l2 & 0.0742 & 0.0492 & 1.51 & 0.1381 \\ 
+stringency\_index.l1 & -0.0276 & 0.0502 & -0.55 & 0.5848 \\ 
+  stringency\_index.l2 & 0.0713 & 0.0490 & 1.46 & 0.1523 \\ 
+stringency\_index.l1 & -0.0488 & 0.0495 & -0.99 & 0.3294 \\ 
+  stringency\_index.l2 & 0.0741 & 0.0472 & 1.57 & 0.1237 \\ 
+stringency\_index.l1 & -0.0486 & 0.0498 & -0.98 & 0.3344 \\ 
+  stringency\_index.l2 & 0.0747 & 0.0482 & 1.55 & 0.1280 \\ 
+stringency\_index.l1 & -0.0544 & 0.0468 & -1.16 & 0.2516 \\ 
+  stringency\_index.l2 & 0.0902 & 0.0455 & 1.98 & 0.0538 \\ 
+stringency\_index.l1 & -0.0525 & 0.0474 & -1.11 & 0.2746 \\ 
+  stringency\_index.l2 & 0.0921 & 0.0459 & 2.00 & 0.0510 \\ 
+stringency\_index.l1 & -0.0529 & 0.0478 & -1.11 & 0.2748 \\ 
+  stringency\_index.l2 & 0.0926 & 0.0461 & 2.01 & 0.0505 \\ 
+stringency\_index.l1 & -0.0532 & 0.0547 & -0.97 & 0.3365 \\ 
+  stringency\_index.l2 & 0.1025 & 0.0524 & 1.96 & 0.0564 \\ 
+stringency\_index.l1 & -0.0536 & 0.0569 & -0.94 & 0.3512 \\ 
+  stringency\_index.l2 & 0.1053 & 0.0544 & 1.93 & 0.0593 \\ 
+stringency\_index.l1 & -0.0527 & 0.0590 & -0.89 & 0.3760 \\ 
+  stringency\_index.l2 & 0.1130 & 0.0555 & 2.03 & 0.0478 \\ 
+stringency\_index.l1 & -0.0313 & 0.0572 & -0.55 & 0.5870 \\ 
+  stringency\_index.l2 & 0.1148 & 0.0540 & 2.12 & 0.0392 \\ 
+stringency\_index.l1 & -0.0199 & 0.0644 & -0.31 & 0.7590 \\ 
+  stringency\_index.l2 & 0.1093 & 0.0607 & 1.80 & 0.0787 \\ 
+stringency\_index.l1 & -0.0184 & 0.0637 & -0.29 & 0.7738 \\ 
+  stringency\_index.l2 & 0.0968 & 0.0606 & 1.60 & 0.1173 \\ 
+stringency\_index.l1 & -0.0037 & 0.0602 & -0.06 & 0.9518 \\ 
+  stringency\_index.l2 & 0.0939 & 0.0572 & 1.64 & 0.1077 \\ 
+stringency\_index.l1 & 0.0034 & 0.0602 & 0.06 & 0.9546 \\ 
+  stringency\_index.l2 & 0.0949 & 0.0559 & 1.70 & 0.0964 \\ 
+stringency\_index.l1 & 0.0241 & 0.0608 & 0.40 & 0.6937 \\ 
+  stringency\_index.l2 & 0.0789 & 0.0555 & 1.42 & 0.1619 \\ 
+stringency\_index.l1 & 0.0626 & 0.0642 & 0.97 & 0.3349 \\ 
+  stringency\_index.l2 & 0.0736 & 0.0554 & 1.33 & 0.1908 \\ 
+stringency\_index.l1 & 0.0435 & 0.0645 & 0.67 & 0.5039 \\ 
+  stringency\_index.l2 & 0.0675 & 0.0557 & 1.21 & 0.2319 \\ 
+stringency\_index.l1 & 0.0543 & 0.0643 & 0.84 & 0.4033 \\ 
+  stringency\_index.l2 & 0.0616 & 0.0555 & 1.11 & 0.2731 \\ 
+stringency\_index.l1 & 0.0582 & 0.0643 & 0.91 & 0.3702 \\ 
+  stringency\_index.l2 & 0.0583 & 0.0553 & 1.05 & 0.2972 \\ 
+stringency\_index.l1 & 0.0659 & 0.0668 & 0.99 & 0.3292 \\ 
+  stringency\_index.l2 & 0.0530 & 0.0578 & 0.92 & 0.3641 \\ 
+stringency\_index.l1 & 0.0824 & 0.0661 & 1.25 & 0.2192 \\ 
+  stringency\_index.l2 & 0.0412 & 0.0573 & 0.72 & 0.4758 \\ 
+stringency\_index.l1 & 0.0823 & 0.0656 & 1.25 & 0.2166 \\ 
+  stringency\_index.l2 & 0.0411 & 0.0568 & 0.72 & 0.4732 \\ 
+stringency\_index.l1 & 0.0870 & 0.0661 & 1.32 & 0.1944 \\ 
+  stringency\_index.l2 & 0.0390 & 0.0566 & 0.69 & 0.4946 \\ 
+stringency\_index.l1 & 0.0844 & 0.0660 & 1.28 & 0.2073 \\ 
+  stringency\_index.l2 & 0.0341 & 0.0563 & 0.61 & 0.5477 \\ 
+stringency\_index.l1 & 0.0915 & 0.0666 & 1.37 & 0.1763 \\ 
+  stringency\_index.l2 & 0.0189 & 0.0567 & 0.33 & 0.7401 \\ 
+stringency\_index.l1 & 0.0992 & 0.0628 & 1.58 & 0.1212 \\ 
+  stringency\_index.l2 & -0.0099 & 0.0546 & -0.18 & 0.8575 \\ 
+stringency\_index.l1 & 0.1099 & 0.0643 & 1.71 & 0.0941 \\ 
+  stringency\_index.l2 & -0.0084 & 0.0567 & -0.15 & 0.8829 \\ 
+stringency\_index.l1 & 0.0763 & 0.0658 & 1.16 & 0.2525 \\ 
+  stringency\_index.l2 & 0.0086 & 0.0565 & 0.15 & 0.8793 \\ 
+stringency\_index.l1 & 0.0537 & 0.0670 & 0.80 & 0.4275 \\ 
+  stringency\_index.l2 & 0.0261 & 0.0583 & 0.45 & 0.6565 \\ 
+stringency\_index.l1 & 0.0899 & 0.0592 & 1.52 & 0.1356 \\ 
+  stringency\_index.l2 & -0.0142 & 0.0549 & -0.26 & 0.7966 \\ 
+stringency\_index.l1 & 0.0912 & 0.0621 & 1.47 & 0.1487 \\ 
+  stringency\_index.l2 & -0.0103 & 0.0578 & -0.18 & 0.8598 \\ 
+stringency\_index.l1 & 0.0946 & 0.0667 & 1.42 & 0.1632 \\ 
+  stringency\_index.l2 & -0.0061 & 0.0614 & -0.10 & 0.9215 \\ 
+stringency\_index.l1 & 0.1520 & 0.0654 & 2.32 & 0.0247 \\ 
+  stringency\_index.l2 & 0.0019 & 0.0576 & 0.03 & 0.9735 \\ 
+stringency\_index.l1 & 0.1278 & 0.0671 & 1.90 & 0.0633 \\ 
+  stringency\_index.l2 & -0.0165 & 0.0586 & -0.28 & 0.7796 \\ 
+stringency\_index.l1 & 0.1487 & 0.0688 & 2.16 & 0.0359 \\ 
+  stringency\_index.l2 & 0.0028 & 0.0606 & 0.05 & 0.9634 \\ 
+stringency\_index.l1 & 0.1466 & 0.0668 & 2.19 & 0.0334 \\ 
+  stringency\_index.l2 & 0.0353 & 0.0602 & 0.59 & 0.5607 \\ 
+stringency\_index.l1 & 0.1605 & 0.0696 & 2.31 & 0.0258 \\ 
+  stringency\_index.l2 & 0.0386 & 0.0597 & 0.65 & 0.5211 \\ 
+stringency\_index.l1 & 0.1549 & 0.0698 & 2.22 & 0.0317 \\ 
+  stringency\_index.l2 & 0.0299 & 0.0607 & 0.49 & 0.6252 \\ 
+stringency\_index.l1 & 0.1902 & 0.0806 & 2.36 & 0.0227 \\ 
+  stringency\_index.l2 & -0.0340 & 0.0915 & -0.37 & 0.7122 \\ 
+stringency\_index.l1 & 0.1947 & 0.0803 & 2.43 & 0.0193 \\ 
+  stringency\_index.l2 & -0.0310 & 0.0914 & -0.34 & 0.7364 \\ 
+stringency\_index.l1 & 0.1577 & 0.0820 & 1.92 & 0.0609 \\ 
+  stringency\_index.l2 & -0.0284 & 0.0900 & -0.32 & 0.7535 \\ 
+stringency\_index.l1 & 0.0886 & 0.0933 & 0.95 & 0.3475 \\ 
+  stringency\_index.l2 & -0.0192 & 0.0877 & -0.22 & 0.8282 \\ 
+stringency\_index.l1 & 0.1580 & 0.0956 & 1.65 & 0.1052 \\ 
+  stringency\_index.l2 & -0.0084 & 0.0835 & -0.10 & 0.9205 \\ 
+stringency\_index.l1 & 0.1546 & 0.0989 & 1.56 & 0.1250 \\ 
+  stringency\_index.l2 & 0.0062 & 0.0860 & 0.07 & 0.9429 \\ 
